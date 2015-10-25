@@ -1,0 +1,1216 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title></title>
+    <script type="text/javascript" src="d3.min.js"></script>
+    <script type="text/javascript" src="jquery-2.1.4.min.js"></script>
+    <script type="text/javascript" src="angular.min.js"></script>
+    <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+    <!--<link rel="stylesheet" href="style.css" />-->
+  </head>
+  <body ng-app="healthhack" ng-controller="RootController">
+    <!--<div class="sidebar">
+      <div class="input-row">
+        <div class="field-block">
+          <div class="field-label">Start Code</div>
+          <input type="text" class="field" value="J01" />
+        </div>
+        <div class="field-block">
+          <div class="field-label">End Code</div>
+          <input type="text" class="field" value="J21" />
+        </div>
+        <button>&times;</button>
+      </div>
+      <div class="input-row">
+        <div class="field-block">
+          <div class="field-label">Start Code</div>
+          <input type="text" class="field" value="J01" />
+        </div>
+        <div class="field-block">
+          <div class="field-label">End Code</div>
+          <input type="text" class="field" value="J21" />
+        </div>
+        <button>&times;</button>
+      </div>
+      <div class="input-row">
+        <div class="field-block">
+          <div class="field-label">Start Code</div>
+          <input type="text" class="field" value="J01" />
+        </div>
+        <div class="field-block">
+          <div class="field-label">End Code</div>
+          <input type="text" class="field" value="J21" />
+        </div>
+        <button>&times;</button>
+      </div>
+    </div>
+    <div class="mainpanel">
+        <div class="bubble-chart-title">J01 - J03</div>
+        <year-bubble-chart></year-bubble-chart>
+        
+        <div class="separator"></div>
+        <div class="bubble-chart-title">J01 - J03</div>
+        <year-bubble-chart></year-bubble-chart>
+        
+        <div class="separator"></div>
+        <div class="bubble-chart-title">J01 - J03</div>
+        <year-bubble-chart></year-bubble-chart>
+    </div>-->
+    <style>
+      @font-face {
+          font-family: 'allerregular';
+          src: url('fonts/aller_rg-webfont.eot');
+          src: url('fonts/aller_rg-webfont.eot?#iefix') format('embedded-opentype'),
+              url('fonts/aller_rg-webfont.woff2') format('woff2'),
+              url('fonts/aller_rg-webfont.woff') format('woff'),
+              url('fonts/aller_rg-webfont.ttf') format('truetype'),
+              url('fonts/aller_rg-webfont.svg#allerregular') format('svg');
+          font-weight: normal;
+          font-style: normal;
+      }
+      
+      * {
+        box-sizing: border-box;
+      }
+      
+      html {
+        height:100%;
+        font-family:Roboto;
+        color:white;
+        /*overflow:hidden;*/
+      }
+      body {
+        margin:0;
+        /*display:flex;
+        flex-direction: row;*/
+        height:100%;
+        background-image: url('5.jpg');
+        /*display:none;*/
+      }
+      
+      .global-summary {
+        background-image: url('5.jpg');
+        position:fixed;
+        top:0;
+        left:0;
+        height:100%;
+        width:100%;
+      }
+      
+      .mainpanel {
+        flex: 1;
+        -webkit-flex: 1;
+        /*background: rgba(63,72,81,1);*/
+        /*position:relative;*/
+        display:flex;
+        display:-webkit-flex;
+        flex-direction: column;
+        -webkit-flex-direction: column;
+        overflow-y:auto;
+      }
+      
+      year-bubble-chart {
+        display:block;
+        padding:0;
+        margin:0;
+        flex:0 0 200px;
+        -webkit-flex:0 0 200px;
+        /*height:100%;*/
+        /*width:100%;*/
+        /*position:absolute;
+        top:0;
+        left:0;*/
+      }
+      
+      .chart-wrapper {
+        /*width:100%;
+        height:100%;*/
+        flex: 1;
+        -webkit-flex:1;
+      }
+      
+      year-bubble-chart {
+        /*width:100%;
+        height:100%;*/
+        display:block;
+        /*height:100%;
+        width:100%;*/
+        position:relative;
+        margin:20px;
+      }
+      
+      svg {
+        display:block;
+      }
+      
+      .year-bubble-chart-svg {
+        display:block;
+        position:absolute;
+        top:0;
+        left:0;
+        width:100%;
+        height:100%;
+      }
+      
+      .bubble {
+        stroke:rgba(255,255,255,0.8);
+        stroke-width:1px;
+        fill:rgba(255,255,255,0.1);
+        transition:all 200ms ease-in-out;
+        -webkit-transition:all 200ms ease-in-out;
+      }
+      
+      .bubblenoanim {
+        stroke:rgba(255,255,255,0.8);
+        stroke-width:1px;
+        fill:rgba(255,255,255,0.1);
+      }
+      
+      .bubbleoverlay {
+        fill:transparent;
+        cursor:pointer;
+      }
+      
+      .bubbleoverlay:hover {
+        fill:rgba(255,255,255,0.1);
+      }
+      
+      .x-axis {
+        font-size:10px;
+      }
+      
+      .x-axis path {
+        stroke:rgba(255,255,255,0.8);
+        fill: none;
+        shape-rendering: crispEdges;
+      }
+      
+      .x-axis text {
+        fill:rgba(255,255,255,0.8);
+      }
+      
+      /*year-bubble-chart-section {
+        display:block;
+        height:100%;
+        float:left;
+      }
+      
+      .year-bubble-chart-section {
+        height:100%;
+        width:100%;
+        background:red;
+      }*/
+      
+      
+      .sidebar {
+        flex: 0 0 300px;
+        -webkit-flex: 0 0 300px;
+        background: rgba(33,40,50,1);
+        padding:20px;
+      }
+      
+      .input-row {
+        display:flex;
+        display:-webkit-flex;
+        flex-direction: row;
+        -webkit-flex-direction: row;
+        padding:10px 20px;
+        transition:all 100ms ease-in-out;
+        -webkit-transition:all 100ms ease-in-out;
+      }
+      
+      .input-row:hover {
+        background:rgba(255,255,255,0.05);
+      }
+      
+      .input-row .field-block {
+        flex:1;
+        -webkit-flex:1;
+        margin-right:10px;
+      }
+      
+      .input-row .field-label {
+        font-size:11px;
+        color:rgba(255,255,255,0.5);
+        margin-bottom:3px;
+      }
+      
+      .input-row .field {
+        width:65px;
+        background:none;
+        border:rgba(255,255,255,0.5) 1px solid;
+        transition:all 100ms ease-in-out;
+        -webkit-transition:all 100ms ease-in-out;
+        color:rgba(255,255,255,0.8);
+        padding:7px 10px;
+        font-size:14px;
+      }
+      
+      .input-row .field:focus {
+        outline:0;
+        border:white 1px solid;
+      }
+      
+      .input-row button {
+        background:none;
+        color:rgba(255,255,255,0.8);
+        font-size:20px;
+        border:none;
+        padding:0;
+      }
+      
+      .bubble-chart-title {
+        color:white;
+        font-size:20px;
+      }
+      
+      .separator {
+        flex: 0 0 1px;
+        -webkit-flex: 0 0 1px;
+        border:rgba(255,255,255,0.8) 1px solid;
+        margin: 0 30px;
+      }
+      
+      .result-bar {
+        -webkit-transition: all 0.75s ease-in-out;
+        transition: all 0.75s ease-in-out;
+        background:rgba(255,255,255,0.1);
+        margin:30px auto;
+        max-width:900px;
+        opacity:0;
+        /*height:500px;*/
+      }
+      
+      body {
+        display:flex;
+        display:-webkit-flex;
+        flex-direction: column;
+        -webkit-flex-direction: column;
+      }
+      
+      .results-area {
+        flex:1;
+        -webkit-flex:1;
+        overflow:auto;
+        /*box-shadow: white 0px 15px 40px -2em inset; */
+        padding-bottom:100px;
+      }
+      
+      .entry-area {
+        flex:0 0 151px;
+        -webkit-flex:0 0 151px;
+        background:rgba(255,255,255,0.1);
+      }
+      
+      .results-area-overlay {
+        position:absolute;
+        /*top:134px;*/
+        top:0;
+        left:0;
+        /*height:calc(100% - 134px);*/
+        height:100%;
+        width:100%;
+        background:transparent;
+      }
+      
+      .entry-form {
+        /*width:300px;*/
+        margin:30px auto;
+        /*display:flex;
+        flex-direction: row;*/
+        text-align:center;
+      }
+      
+      .entry-field-wrapper {
+        /*flex: 1;*/
+      }
+      
+      .entry-field {
+        padding:10px;
+        background:none;
+        border:rgba(255,255,255,0.5) 1px solid;
+        font-size:20px;
+        color:rgba(255,255,255,0.5);
+        margin:5px;
+        display:inline-block;
+        width:80px;
+        /*border-radius:4px;*/
+      }
+      
+      .entry-field:focus {
+        outline:none;
+        background:rgba(255,255,255,0.1);
+        border:rgba(255,255,255,0.8) 1px solid;
+      }
+      
+      .entry-field:active {
+        outline:none;
+      }
+      
+      .entry-button {
+        margin: 5px;
+        font-size: 20px;
+        padding: 10px 20px;
+        background:rgba(255,255,255,0.7);
+        border:none;
+        color: rgb(201,74,57);
+        cursor:pointer;
+      }
+      
+      .entry-button:hover {
+        background:rgba(255,255,255,0.8);
+      }
+      
+      .entry-button:active {
+        background:rgba(255,255,255,0.9);
+      }
+      
+      .entry-button:active, .entry-button:focus {
+        outline:none;
+      }
+      
+      /*::-webkit-scrollbar { 
+          display: none; 
+      }*/
+      
+      .result-bar {
+        display:flex;
+        flex-direction: column;
+        -webkit-display:flex;
+        -webkit-flex-direction: column;
+      }
+      
+      .padding {
+        flex:1 0 20px;
+        -webkit-flex:1 0 20px;
+      }
+      
+      .result-header {
+        flex:0 0 auto;
+        -webkit-flex:0 0 auto;
+        text-align: center;
+        font-size:40px;
+        color:rgba(255,255,255,0.5);
+      }
+      
+      .result-loading {
+        margin-top:15px;
+        text-align: center;
+        height:30px;
+      }
+      
+      .loading {
+        height:30px;
+      }
+      
+      .chart-area {
+        transition: all 0.75s ease-in-out;
+        -webkit-transition: all 0.75s ease-in-out;
+        margin:0 30px 30px 30px;
+        opacity:0;
+      }
+      
+      .chart-axis {
+        stroke:rgba(255,255,255,0.5);
+        stroke-width:1px;
+        
+      }
+      
+      .results-area-overlay {
+        display:none;
+      }
+      
+      .comorbid {
+        fill:rgba(255,255,255,0.5);
+      }
+      
+      .summary-bar {
+        fill:rgba(255,255,255,0.5);
+        transition: all 0.15s ease-in-out;
+        -webkit-transition: all 0.15s ease-in-out;
+      }
+      
+      .comorbid-code {
+        font-size:16px;
+        color:rgba(0,0,0,1);
+      }
+      
+      .comorbid-count {
+        font-size:40px;
+        fill:rgba(255,255,255,0.5);
+      }
+      
+      .summary-count {
+        fill:rgba(255,255,255,0.8);
+      }
+      
+      comorbid-chart {
+        height:500px;
+        width:500px;
+        position:fixed;
+        top: calc(50% - 250px);
+        left: calc(50% - 250px);
+        display:block;
+        opacity:0;
+        transition: all 0.75s ease-in-out;
+        -webkit-transition: all 0.75s ease-in-out;
+      }
+      
+      .year-label {
+        fill:rgba(255,255,255,0.5);
+        font-size:10px;
+        text-anchor:middle;
+      }
+      
+      .count-label {
+        fill:rgba(255,255,255,0.5);
+        font-size:10px;
+        text-anchor:middle;
+      }
+      
+      .result-text {
+        transition: all 0.75s ease-in-out;
+        -webkit-transition: all 0.75s ease-in-out;
+      }
+      
+      .global-summary {
+        transition: all 0.75s ease-in-out;
+        -webkit-transition: all 0.75s ease-in-out;
+      }
+      
+      .summary-count {
+        transition: all 0.15s ease-in-out;
+        -webkit-transition: all 0.15s ease-in-out;
+      }
+      
+      .global-button {
+        margin: 20px auto;
+        font-size: 40px;
+        padding: 20px 40px;
+        background:rgba(255,255,255,0.7);
+        border:none;
+        color: rgb(201,74,57);
+        cursor:pointer;
+        display:inline-block;
+      }
+      
+      .global-button-container {
+        text-align:center;
+      }
+      
+      
+      
+      .global-button:hover {
+        background:rgba(255,255,255,0.8);
+      }
+      
+      .global-button:active {
+        background:rgba(255,255,255,0.9);
+      }
+      
+      .global-button:active, .global-button:focus {
+        outline:none;
+      }
+      
+      /*svg {
+        overflow:visible;
+      }*/
+      
+      .stats {
+        max-width:1000px;
+        margin: 0px auto;
+        height:300px;
+      }
+      
+      .statsitem {
+        width:calc(33% - 40px);
+        height:100%;
+        float:left;
+        /*background:red;*/
+      }
+      
+      
+      
+      summary-chart {
+        height:100%;
+        width:100%;
+        /*position:fixed;
+        top: calc(50% - 250px);
+        left: calc(50% - 250px);*/
+        display:block;
+        /*opacity:0;*/
+        /*transition: all 0.75s ease-in-out;
+        -webkit-transition: all 0.75s ease-in-out;*/
+      }
+      
+      .summary-text {
+        font-size: 20px;
+        text-align:center;
+        margin:5px;
+        opacity: 0.8;
+      }
+      
+      .examples {
+        margin:10px;  
+      }
+      
+      a{
+        color:rgba(255,255,255,0.8);
+      }
+    </style>
+    
+    
+    <div class="global-summary" ng-init="globalShowing = true" ng-style="{ opacity: globalShowing ? 1 : 0 }">
+      <div class="global-title" style="text-align:center;margin-top:30px;font-size:40px;">Telethon Kids Institute Hospitalisation Data</div>
+      <div class="global-title" style="text-align:center;margin-top:10px;font-size:16px;">Search through over 800,000 admissions to WA hospitals for persons under the age of 25.</div>
+      <div class="global-button-container">
+        <div class="global-button" ng-click="hideGlobal()">Search Now</div>
+      </div>
+      
+      <div class="stats">
+        <div class="statsitem" style="margin-right:60px;">
+          <div class="summary-text">Summary</div>
+          <summary-chart items="items1" suffix=" "></summary-chart>
+        </div>
+        <div class="statsitem" style="margin-right:60px;">
+          <div class="summary-text">Top 10 reasons for admission</div>
+          <summary-chart items="items2" suffix="admissions for"></summary-chart>
+        </div>
+        <div class="statsitem">
+          <div class="summary-text">Top 10 procedures</div>
+          <summary-chart items="items3" suffix="procedures of"></summary-chart>
+        </div>
+      </div>
+      <!--<div class="global-title" style="text-align:center;margin-top:100px;font-size:30px;">Search through over 800,000 admissions to WA hospitals for persons under the age of 25.</div>-->
+    </div>
+    
+    <div class="entry-area">
+      <div class="entry-form">
+        <div style="padding-bottom:5px;">Enter a range of <a href="http://www.icd10data.com/ICD10CM/Codes">codes</a> and press Search or go <a href="javascript:location.reload()">back</a></div>
+        <!--<div class="entry-field-wrapper">-->
+          <input class="entry-field" ng-model="startCode" ng-init="startCode = 'J00'" />  
+        <!--</div>-->
+        <!--<div class="entry-field-wrapper">-->
+          <input class="entry-field" ng-model="endCode" ng-init="endCode = 'J99'" ng-keydown="keyDown($event)" />  
+        <!--</div>-->
+        <button class="entry-button" ng-click="addSearch(startCode, endCode)">Search</button>
+        <div class="examples">Or try these searches: 
+          <a ng-click="addSearch('J00', 'J99')" href="javascript:void()">Respiratory</a>,
+          <a ng-click="addSearch('M00', 'M99')" href="javascript:void()">Musculoskeletal</a>,
+          <a ng-click="addSearch('A00', 'B99')" href="javascript:void()">Infectious</a>
+        </div>
+      </div>
+    </div>
+    <div class="results-area">
+      <chart ng-repeat="search in searches" start-code="search.startCode" end-code="search.endCode"></chart>
+    </div>
+    <div class="results-area-overlay">
+      <svg class="globalSvg" style="width:100%;height:100%"></svg>
+    </div>
+    
+    <a style="position:fixed; top:10px;right:15px;color:rgba(255,255,255, 0.8);font-size:12px;" class="project-info" href="https://github.com/ChrisBellew/TelethonKidsHospitalData">What is this project?</a>
+    <script type="text/ng-template" id="chart.html">
+      <div class="result-bar" ng-style="{ opacity: appeared ? 1 : 0 }">
+        <div class="padding"></div>
+        <div class="result-header" style="position:relative">
+          <div class="result-name">{{ search.startCode }} - {{ search.endCode }}<span style="font-size:16px;display: block;padding: 0 80px;">{{startCodeFriendly}} - {{endCodeFriendly}}</span></div>
+          <div class="result-text" style="position:absolute;top: 15px;right: 50px;font-size: 16px;font-size:16px;opacity:0;" ng-style="{ opacity: totalAdmissions == null ? 0 : 1 }">{{ totalAdmissions + ' total admissions' }}</div>
+        <div class="result-loading">
+          <img src="loading.svg" class="loading" ng-show="loading" />
+        </div>
+        <div class="chart-area" ng-style="{ height: loading ? 0 : '250px', opacity: ready ? 1 : 0 }">
+          <svg></svg>
+        </div>
+        <div class="padding"></div>
+      </div>
+    </script>
+    
+    <script type="text/ng-template" id="comorbid-chart.html">
+      <svg style="width:100%;height:100%;overflow:visible"></svg>
+    </script>
+    
+    <script>
+      var globalChartElement;
+      $('.results-area-overlay').click(function() {
+        $('.results-area-overlay').css('display', 'none');
+        $('.results-area').css('opacity', '1');
+        if (globalChartElement) {
+          globalChartElement.remove();
+          globalChartElement = null;
+        }
+      })
+      
+      angular.module('healthhack', [])
+      .controller('RootController', ['$scope', '$http', function($scope, $http) {
+        $scope.hideGlobal = function() {
+          $scope.globalShowing = false;
+          setTimeout(function() {
+            $('.global-summary').css('display', 'none');
+          }, 750);
+        }
+        
+        $scope.codes = {};
+        $http({ url: 'codes.json' }).then(function(result) {
+          if (result.data) {
+            $scope.codes = result.data;
+            $scope.codes['J00'] = 'Acute nasopharyngitis [common cold]';
+            $scope.codes['J99'] = 'Respiratory disorders in diseases classified elsewhere';
+            $scope.codes['A00'] = 'Intestinal infectious diseases';
+            
+            
+            //document.body.style.display = 'block';
+          }
+        });
+        
+        $scope.searches = [];
+        
+        $scope.addSearch = function(startCode, endCode) {
+          $scope.searches.push({ startCode: (startCode || '').toUpperCase(), endCode: (endCode || '').toUpperCase() });
+          
+          setTimeout(function() {
+            var objDiv = $('.results-area')[0];
+            //objDiv.scrollTop = objDiv.scrollHeight;
+            
+            $('.results-area').scrollTo(objDiv.scrollHeight);
+          })
+        }
+        
+        $scope.keyDown = function($event) {
+          if ($event.which === 13) {
+            $scope.addSearch($scope.startCode, $scope.endCode);
+          }
+        }
+        
+        $scope.items1 = [
+            { Code: 'Total admissions', Count: 858969 },
+            { Code: 'Total diagnoses', Count: 1720149 },
+            { Code: 'Total procedures', Count: 1184728 }
+        ]
+        
+        $scope.items2 = [
+            { Code: 'Z38', Count: 175665 },
+            { Code: 'Z72', Count: 44879 },
+            { Code: 'K01', Count: 35196 },
+            { Code: 'J35', Count: 27976 },
+            { Code: 'Z37', Count: 27459 },
+            { Code: 'Z76', Count: 26403 },
+            { Code: 'P07', Count: 26194 },
+            { Code: 'H65', Count: 23350 },
+            { Code: 'Z03', Count: 21295 },
+            { Code: 'J45', Count: 19330 }
+        ]
+        
+        $scope.items3 = [
+            { Code: '92168-00', Count: 87921 },
+            { Code: '92514-19', Count: 86571 },
+            { Code: '92514-99', Count: 60810 },
+            { Code: '95550-09', Count: 42210 },
+            { Code: '92502-02', Count: 35474 },
+            { Code: '97323-00', Count: 34118 },
+            { Code: '41632-01', Count: 24420 },
+            { Code: '92514-29', Count: 23508 },
+            { Code: '95550-03', Count: 23439 },
+            { Code: '90467-00', Count: 18928 }
+        ]
+      }])
+      .directive('comorbidChart', [function() {
+        return {
+          scope: true,
+          restrict: 'E',
+          replace: false,
+          templateUrl: 'comorbid-chart.html',
+          controller: ['$scope', '$element', '$timeout', '$attrs', '$http', function($scope, $element, $timeout, $attrs, $http) {
+            var svg = d3.select($element[0]).select('svg');
+            var items = $scope.chosenSection.Cobmorbidities;
+            
+            var maxCount = d3.max(items, function(item) { return item.Count; });
+            
+            var xScale = d3.scale.linear().domain([0, maxCount]).range([0, $element.width()]);
+            var barPadding = 40;
+            var barHeight = ($element.height() - barPadding * items.length + 1) / items.length;
+            
+            
+            
+            svg.selectAll('.comorbid').data(items)
+              .enter()
+                .append('rect')
+                .attr('class', 'comorbid')
+                .attr('x', function(d, i) { return 0; })
+                .attr('y', function(d, i) { return i * barHeight + (i + 1) * barPadding; })
+                .attr('height', function(d, i) { return barHeight; })
+                .attr('width', function(d, i) { return xScale(d.Count) });
+                
+            d3.select($element[0]).selectAll('.comorbid-code').data(items)
+              .enter()
+                .append('div')
+                .attr('class', 'comorbid-code')
+                // .style('background', 'red')
+                .style('position', 'absolute')
+                .style('width', function(d, i) { return (xScale(d.Count) - 20) + 'px' })
+                .style('left', function(d, i) { return '15px'; })
+                .style('top', function(d, i) { return (i * barHeight + (i + 1) * barPadding + barHeight / 2 - 19) + 'px'; })
+                .each(function(item) {
+                  // var limit = 40;
+                  
+                  var text = $scope.codes[item.Code] || item.Code;
+                  // if (text.length > limit) {
+                  //   $(this).text(text.substring(0, 100) + '...');
+                  // } else {
+                    $(this).text(text);
+                  // }
+                })
+                
+            var format = d3.format("0,000");
+                  
+            svg.selectAll('.comorbid-count').data(items)
+              .enter()
+                .append('text')
+                .attr('class', 'comorbid-count')
+                .attr('x', function(d, i) { return xScale(d.Count) + 20; })
+                .attr('y', function(d, i) { return i * barHeight + (i + 1) * barPadding + barHeight / 2 + 13; })
+                .each(function(item) {
+                  var formattedX = format(item.Count);
+                  $(this).text(formattedX);
+                })
+          }]
+        }  
+      }])
+      .directive('summaryChart', [function() {
+        return {
+          scope: true,
+          restrict: 'E',
+          replace: false,
+          templateUrl: 'comorbid-chart.html',
+          controller: ['$scope', '$element', '$timeout', '$attrs', '$http', function($scope, $element, $timeout, $attrs, $http) {
+            var svg = d3.select($element[0]).select('svg');
+            var items = $scope[$attrs.items];
+            
+            var maxCount = d3.max(items, function(item) { return item.Count; });
+            
+            var xScale = d3.scale.linear().domain([0, maxCount]).range([0, $element.width()]);
+            var barPadding = 5;
+            var barHeight = ($element.height() - barPadding * items.length + 1) / items.length;
+            
+            svg.selectAll('.summary-bar').data(items)
+              .enter()
+                .append('rect')
+                .attr('class', 'summary-bar')
+                .attr('x', function(d, i) { return 0; })
+                .attr('y', function(d, i) { return i * barHeight + (i + 1) * barPadding; })
+                .attr('height', function(d, i) { return barHeight; })
+                .attr('width', function(d, i) { return xScale(d.Count) })
+                .each(function(item) {
+                  item.barElement = $(this);
+                })
+                
+            // svg.selectAll('.comorbid-code').data(items)
+            //   .enter()
+            //     .append('text')
+            //     .attr('class', 'comorbid-code')
+            //     .attr('x', function(d, i) { return 20; })
+            //     .attr('y', function(d, i) { return i * barHeight + (i + 1) * barPadding + barHeight / 2 + 13; })
+            //     .each(function(item) {
+            //       $(this).text(item.Code);
+            //     })
+                
+            var format = d3.format("0,000");
+                  
+            svg.selectAll('.summary-count').data(items)
+              .enter()
+                .append('text')
+                .attr('class', 'summary-count')
+                .style('font-size', '20px')
+                .style('opacity', '0')
+                .attr('x', function(d, i) { return 5; })
+                .attr('y', function(d, i) { return i * barHeight + (i + 1) * barPadding + barHeight / 2 + 6; })
+                .each(function(item) {
+                  item.countElement = $(this);
+                  var formattedX = format(item.Count);
+                  $(this).text(formattedX + ' ' + $attrs.suffix + ' ' + item.Code);
+                })
+                
+            svg.selectAll('.summary-overlay').data(items)
+              .enter()
+                .append('rect')
+                .style('fill', 'transparent')
+                .attr('x', function(d, i) { return 0; })
+                .attr('width', function(d, i) { return $element.width(); })
+                .attr('height', function(d, i) { return barHeight; })
+                .attr('y', function(d, i) { return i * barHeight + (i + 1) * barPadding; })
+                .each(function(item) {
+                  item.overlayElement = $(this);
+                  $(this).mouseover(function() {
+                    item.countElement.css('opacity', 1);
+                    item.barElement.css('opacity', 0);
+                  });
+                  $(this).mouseout(function() {
+                    item.countElement.css('opacity', 0);
+                    item.barElement.css('opacity', 1);
+                  });
+                })
+          }]
+        }  
+      }])
+      .directive('chart', [function() {
+        var wait = 500;
+        return {
+          scope: true,
+          restrict: 'E',
+          replace: true,
+          templateUrl: 'chart.html',
+          controller: ['$scope', '$element', '$timeout', '$attrs', '$http', '$compile', function($scope, $element, $timeout, $attrs, $http, $compile) {
+            $scope.startCodeFriendly = $scope.codes[$scope.search.startCode] || $scope.search.startCode;
+            $scope.endCodeFriendly = $scope.codes[$scope.search.endCode] || $scope.search.endCode; 
+            
+            $scope.loading = true;
+            $scope.ready = false;
+            // $scope.startCode = $scope[$attrs.startCode];
+            // $scope.endCode = $scope[$attrs.endCode];
+            
+            $timeout(function() {
+                $scope.appeared = true;
+            });
+            
+            
+            var url = 'http://52.64.197.215/HospitalData/api/values/byyear?';
+            //var url = 'http://localhost/HealthHack/api/values/byyear?'
+            url += 'codeMin=' + $scope.search.startCode + '&codeMax=' + $scope.search.endCode
+            $http({ url: url }).then(function(response) {
+              sections = response.data;
+              $scope.loading = false;
+              
+              $timeout(function() {
+                render();  
+                $scope.ready = true;
+              }, 750);
+            }).catch(function(err) {
+              alert('Error');
+            });
+            
+            var container = $element.find('.chart-area');
+            var svg = d3.select($element[0]).select('svg');
+            var globalSvg = d3.select('.globalSvg');
+            //render();
+            
+            function render() {
+              var format = d3.format("0,000");
+              $scope.totalAdmissions = format(d3.sum(sections, function(section) { return section.Count }));
+              
+              var width = container.width();
+              var height = container.height();
+              svg.attr('width', width);
+              svg.attr('height', height);              
+            
+              var xPadding = 20;
+              var innerWidth = width - xPadding * 2;
+            
+              var years = sections.map(function(section) { return section.Year });
+              var xScale = d3.scale.ordinal().domain(years).range([0, innerWidth]);
+              var xAxis = d3.svg.axis().scale(xScale).tickValues(years);
+              var xScaleHeight = 20;
+              //var yScaleWidth = 30;
+                            
+              var numYears = sections.length;
+              var chunkWidth = innerWidth / numYears;
+              
+              var chunkPadding = 10;
+              var chunkInnerWidth = chunkWidth - chunkPadding * 2;
+              var chunkInnerHeight = height - chunkPadding - xScaleHeight;
+              var chunkCenterXOffset = chunkWidth / 2;
+              var chunkCenterYOffset = chunkInnerHeight / 2;
+              
+              var maxCount = d3.max(sections, function(section) { return section.Count });
+              var maxRadius = Math.min(chunkInnerWidth / 2, chunkInnerHeight / 2);
+              
+              var bubbles = [];
+              svg.selectAll('.bubble').data(sections)
+                .enter()
+                  .append('circle')
+                  .attr({ class: 'bubble' })
+                  .attr({ cx: function(d, i) { return xPadding + i * chunkWidth + chunkCenterXOffset; } })
+                  .attr({ cy: function(d, i) { return chunkCenterYOffset; } })
+                  .attr({ r: function(d, i) { return d.Count / maxCount * maxRadius; } })
+                  .each(function(section) {
+                    section.bubble = $(this);
+                    bubbles.push(section.bubble);
+                  })
+                  //.attr({ fill: function(d, i) { return 'red'; } })
+              
+              svg.selectAll('.year-label').data(sections)
+              .enter()
+                .append('text')
+                .attr('class', 'year-label')
+                .attr({ x: function(d, i) { return xPadding + i * chunkWidth + chunkCenterXOffset; } })
+                .attr('y', function(d, i) { return height - 5; })
+                .each(function(item) {
+                  $(this).text(item.Year);
+                })
+              
+                
+              svg.selectAll('.count-label').data(sections)
+              .enter()
+                .append('text')
+                .attr('class', 'count-label')
+                .attr({ x: function(d, i) { return xPadding + i * chunkWidth + chunkCenterXOffset; } })
+                .attr('y', function(d, i) { return chunkCenterYOffset - (d.Count / maxCount * maxRadius) - 10; })
+                .each(function(item) {
+                  var formattedX = format(item.Count);
+                  $(this).text(formattedX);
+                })
+                  
+              // svg.selectAll('.line').data(sections)
+              //   .enter()
+              //     .append('line')
+              //     .attr({ x1: function(d, i) { return (i + 1) * chunkWidth; } })
+              //     .attr({ x2: function(d, i) { return (i + 1) * chunkWidth; } })
+              //     .attr({ y1: function(d, i) { return 0; } })
+              //     .attr({ y2: function(d, i) { return height; } })
+              //     .attr({ stroke: function(d, i) { return 'white'; } })
+              
+              // sections.forEach(function(section) {
+                
+              // });
+              
+              // d3.select(container[0]).data(sections)
+              //   .enter()
+              //     .append('text')
+              //     .attr({ class: 'chart-axis-label' })
+              //     .attr({ x: function(d, i) { return xPadding + i * chunkWidth; } })
+              //     .attr({ y: function(d, i) { return 0; } })
+              //     .append('2000')
+              
+              
+              svg.selectAll('.bubbleoverlay').data(sections)
+                .enter()
+                  .append('rect')
+                  .attr({ class: 'bubbleoverlay' })
+                  .attr({ x: function(d, i) { return xPadding + i * chunkWidth; } })
+                  .attr({ width: function(d, i) { return chunkWidth; } })
+                  .attr({ y: function(d, i) { return 0; } })
+                  .attr({ height: function(d, i) { return height - xScaleHeight; } })
+                  .each(function(section, index) {
+                    $(this).mouseover(function() {
+                      bubbles.forEach(function(bubble) {
+                        if (bubble !== section.bubble) {
+                          bubble.css('opacity', 0.2);  
+                        }
+                      })
+                    })
+                    $(this).mouseout(function() {
+                      bubbles.forEach(function(bubble) {
+                        if (bubble !== section.bubble) {
+                          bubble.css('opacity', 1);  
+                        }
+                      })
+                    })
+                    $(this).mousedown(function() {
+                        $scope.chosenSection = section;
+                        section.bubble.css('opacity', 0);  
+                        
+                        var rect = section.bubble[0].getBoundingClientRect();
+                        //rect.top -= 200;
+                        
+                        $('.results-area-overlay').css('display', 'block');
+                        $('.results-area').css('opacity', '0.2');
+                        $('.results-area-overlay').css('background', 'rgba(0,0,0,0.2)');
+                        
+                        
+                        
+                        var radius = section.Count / maxCount * maxRadius;
+                        
+                        var bodyRect = document.body.getBoundingClientRect();
+                        
+                        var centerScreenX = bodyRect.width / 2;
+                        var centerScreenY = bodyRect.height / 2;
+                        var numComorbidities = section.Cobmorbidities.length;
+                        var comorbidityRadius = 300;
+                        
+                        globalSvg.append('circle')
+                            .attr({ class: 'bubblenoanim' })
+                            .attr({ cx: function(d, i) { return rect.left + radius; } })
+                            .attr({ cy: function(d, i) { return rect.top + radius; } })
+                            .attr({ r: function(d, i) { return section.Count / maxCount * maxRadius; } })
+                            .transition()
+                            //.delay(0)
+                            .duration(2500)
+                            .ease(d3.ease('cubic-in-out'))
+                            .attr({ cx: function(d, i) { return bodyRect.width / 2; } })
+                            .attr({ cy: function(d, i) { return bodyRect.height / 2; } })
+                            .attr({ r: function(d, i) { return centerScreenX * 2; } })
+                            // .each(function(section) {
+                            //   section.bubble = $(this);
+                            //   bubbles.push(section.bubble);
+                            // })
+                        
+                        $timeout(function() {
+                          globalChartElement = $compile('<comorbid-chart></comorbid-chart>')($scope);
+                          $(document.body).append(globalChartElement);
+                          $timeout(function() {
+                            globalChartElement.css('opacity', 1);
+                          });
+                        }, 1000)
+                           
+                        // globalSvg.selectAll('.bubblenoanim')
+                        //   .data(section.Cobmorbidities)
+                        //   .enter()
+                        //     .append('circle')
+                        //     .attr({ class: 'bubblenoanim' })
+                        //     .attr({ r: function(d, i) { return 300; } })
+                        //     .attr({ cx: function(d, i) { 
+                        //       return centerScreenX + comorbidityRadius * Math.sin(2 * Math.PI * (i / numComorbidities)); } 
+                        //     })
+                        //     .attr({ cy: function(d, i) { 
+                        //       return centerScreenY - comorbidityRadius * Math.cos(2 * Math.PI * (i / numComorbidities)); } 
+                        //     })
+                    })
+                  })
+                  //.attr({ fill: function(d, i) { return 'red'; } })
+              
+              svg.append('line')
+                .attr({ class: 'chart-axis' })
+                .attr('x1', xPadding)
+                .attr('x2', width - xPadding)
+                .attr('y1', height - xScaleHeight)
+                .attr('y2', height - xScaleHeight)
+                // svg
+                //   .append("g")
+                //     .attr('class', 'x-axis')
+                //     .attr("transform", "translate(" + xPadding + "," + (height - xScaleHeight) + ")")
+                //     .call(xAxis);
+            }
+            
+            // $timeout(function() {
+            //   $scope.loading = false;
+            // }, (wait = wait + 500));
+          }]
+        }  
+      }])
+      .directive('yearBubbleChart', [function() {
+        return {
+          scope: true,
+          replace: false,
+          restrict: 'E',
+          templateUrl: 'year-bubble-chart.html',
+          controller: ['$scope', '$element', '$http', '$attrs', function($scope, $element, $http, $attrs) {
+            $scope.startCode = $scope[$attrs.startCode];
+            $scope.endCode = $scope[$attrs.endCode];
+            
+            $http({ url: 'http://localhost/HealthHack/api/values/byyear?codeMin=' + $scope.startCode + '&codeMax=' + $scope.endCode }).then(function(response) {
+              if (response.err) {
+                alert('Error:' + response.err);
+                return;
+              }
+              
+              sections = response.data;
+              render();
+            });
+                        
+            var svg = d3.select($element[0]).select('svg');
+            //render();
+            
+            function render() {
+              var width = $element.width();
+              var height = $element.height();
+              svg.attr('width', width);
+              svg.attr('height', height);              
+            
+              var xPadding = 20;
+              var innerWidth = width - xPadding * 2;
+            
+              var years = sections.map(function(section) { return section.Year });
+              var xScale = d3.scale.ordinal().domain(years).range([0, innerWidth]);
+              var xAxis = d3.svg.axis().scale(xScale).tickValues(years);
+              var xScaleHeight = 20;
+              //var yScaleWidth = 30;
+                            
+              var numYears = sections.length;
+              var chunkWidth = innerWidth / numYears;
+              
+              var chunkPadding = 10;
+              var chunkInnerWidth = chunkWidth - chunkPadding * 2;
+              var chunkInnerHeight = height - chunkPadding - xScaleHeight;
+              var chunkCenterXOffset = chunkWidth / 2;
+              var chunkCenterYOffset = chunkInnerHeight / 2;
+              
+              var maxCount = d3.max(sections, function(section) { return section.Count });
+              var maxRadius = Math.min(chunkInnerWidth / 2, chunkInnerHeight / 2);
+              
+              svg.selectAll('.bubble').data(sections)
+                .enter()
+                  .append('circle')
+                  .attr({ class: 'bubble' })
+                  .attr({ cx: function(d, i) { return xPadding + i * chunkWidth + chunkCenterXOffset; } })
+                  .attr({ cy: function(d, i) { return chunkCenterYOffset; } })
+                  .attr({ r: function(d, i) { return d.Count / maxCount * maxRadius; } })
+                  //.attr({ fill: function(d, i) { return 'red'; } })
+                  
+              // svg.selectAll('.line').data(sections)
+              //   .enter()
+              //     .append('line')
+              //     .attr({ x1: function(d, i) { return (i + 1) * chunkWidth; } })
+              //     .attr({ x2: function(d, i) { return (i + 1) * chunkWidth; } })
+              //     .attr({ y1: function(d, i) { return 0; } })
+              //     .attr({ y2: function(d, i) { return height; } })
+              //     .attr({ stroke: function(d, i) { return 'white'; } })
+              
+              svg.selectAll('.bubbleoverlay').data(sections)
+                .enter()
+                  .append('rect')
+                  .attr({ class: 'bubbleoverlay' })
+                  .attr({ x: function(d, i) { return xPadding + i * chunkWidth; } })
+                  .attr({ width: function(d, i) { return chunkWidth; } })
+                  .attr({ y: function(d, i) { return 0; } })
+                  .attr({ height: function(d, i) { return height - xScaleHeight; } })
+                  //.attr({ fill: function(d, i) { return 'red'; } })
+                  
+                svg
+                  .append("g")
+                    .attr('class', 'x-axis')
+                    .attr("transform", "translate(" + xPadding + "," + (height - xScaleHeight) + ")")
+                    .call(xAxis);
+            }
+          }]
+        }
+      }])
+      // .directive('yearBubbleChartSection', [function() {
+      //   return {
+      //     scope: true,
+      //     restrict: 'E',
+      //     templateUrl: 'year-bubble-chart-section.html',
+      //     controller: ['$scope', '$element', '$attrs', function($scope, $element, $attrs) {
+      //       $scope.section = $scope[$attrs.section];
+      //       $scope.chunkWidth = $scope[$attrs.chunkWidth];
+      //     }]
+      //   }
+      // }])
+      
+      $.fn.scrollTo = function( target, options, callback ){
+        if(typeof options == 'function' && arguments.length == 2){ callback = options; options = target; }
+        var settings = $.extend({
+          scrollTarget  : target,
+          offsetTop     : 50,
+          duration      : 500,
+          easing        : 'swing'
+        }, options);
+        return this.each(function(){
+          var scrollPane = $(this);
+          var scrollTarget = (typeof settings.scrollTarget == "number") ? settings.scrollTarget : $(settings.scrollTarget);
+          var scrollY = (typeof scrollTarget == "number") ? scrollTarget : scrollTarget.offset().top + scrollPane.scrollTop() - parseInt(settings.offsetTop);
+          scrollPane.animate({scrollTop : scrollY }, parseInt(settings.duration), settings.easing, function(){
+            if (typeof callback == 'function') { callback.call(this); }
+          });
+        });
+      }
+    </script>
+  </body>
+  <script type="text/ng-template" id="year-bubble-chart.html">
+    <svg class="year-bubble-chart-svg" style="display:block"></svg>
+  </script>
+  <!--<script type="text/ng-template" id="year-bubble-chart-section.html">
+    <div class="year-bubble-chart-section" ng-style="{ width: chunkWidth + 'px' }">
+    {{section.year}}
+    </div>
+  </script>-->
+</html>
