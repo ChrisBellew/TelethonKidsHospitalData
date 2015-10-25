@@ -1,5 +1,7 @@
 # TelethonKidsHospitalData
 
+Demo: http://telethonkidshospitaldata.s3-website-ap-southeast-2.amazonaws.com/
+
 Medical researchers want a tool to help them analyse the large number of hospital admissions for children in WA. Technical tools require programming or database skills and so require the time of trained statisticians. Telethon kids institute need a tool to help them discover patterns in the diagnoses of children.
 
 We started the weekend with the idea to build a web application to allow users to search for trends in particular diagnoses. The target audience is familier with the use of IDC-10 codes http://www.icd10data.com/ICD10CM/Codes, which classify the various diseases, so the tool allows the users to type in a range of codes and search to see the trend.
